@@ -13,8 +13,12 @@ var morgan       = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var session      = require('express-session');
+//var RedisStore = require('connect-redis')(session);
+//var redis = require("redis").createClient();
+
 
 var configDB = require('./config/database.js');
+var router = express.Router();
 
 // configuration ===============================================================
 mongoose.connect(configDB.url); // connect to our database
@@ -29,11 +33,22 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set('view engine', 'ejs'); // set up ejs for templating
 
+
 // required for passport
-app.use(session({ secret: 'ilovescotchscotchyscotchscotch' })); // session secret
+app.use(session({
+   // store: new RedisStore({
+   //     host: 'localhost',
+    //    port:  6379
+  //  }),
+    secret: 'Its a secret.'
+   // cookie: { secure: true }
+}));    // session secret
+
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
+
+
 
 // routes ======================================================================
 require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
